@@ -14,7 +14,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
-from src.constants import ETS1_LEN, fg_encode_map
+from src.constants import *
+
+TF = 'EGR1'
 
 
 def set_global_seed(seed: Optional[int] = None) -> None:
@@ -43,8 +45,8 @@ def parse_groove_column(value: Iterable) -> list[list[str]]:
     raise TypeError(f"Unsupported groove column type {type(value)}")
 
 
-class ETS1GrooveDataset(Dataset):
-    """Torch dataset wrapping ETS1 groove encodings."""
+class GrooveDataset(Dataset):
+    """Torch dataset wrapping groove encodings."""
 
     def __init__(self, dataframe: pd.DataFrame):
         expected_columns = {"Groove_major", "Groove_minor", "ln(I)"}
@@ -73,7 +75,7 @@ class ETS1GrooveDataset(Dataset):
 from src.models import CNN_network
 
 class Model:
-    """High-level training/evaluation wrapper around the ETS1 CNN."""
+    """High-level training/evaluation wrapper around the CNN."""
 
     def __init__(self, config: Optional[dict] = None, random_state: Optional[int] = None):
         set_global_seed(random_state)
@@ -82,7 +84,7 @@ class Model:
         self.config = config or {}
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net = CNN_network().to(self.device)
-        self.num_params = sum(p.numel() for p in self.net.parameters() if p.requires_grad)
+        # self.num_params = sum(p.numel() for p in self.net.parameters() if p.requires_grad)
         self._history: dict[str, list[float]] = {"train_loss": [], "val_loss": []}
         self._best_state: Optional[dict] = None
 
@@ -250,7 +252,7 @@ def create_data_loaders(
     test_ratio: float = 0.15,
 ) -> tuple[DataLoader, Optional[DataLoader], DataLoader]:
     """
-    Build train/validation/test data loaders from the encoded ETS1 dataset.
+    Build train/validation/test data loaders from the encoded dataset.
 
     Returns:
         (train_loader, val_loader, test_loader) where val_loader may be None if
@@ -289,9 +291,9 @@ def create_data_loaders(
     else:
         val_df = train_df.iloc[[]]
 
-    train_dataset = ETS1GrooveDataset(train_df)
-    val_dataset = ETS1GrooveDataset(val_df) if len(val_df) else None
-    test_dataset = ETS1GrooveDataset(test_df)
+    train_dataset = GrooveDataset(train_df)
+    val_dataset = GrooveDataset(val_df) if len(val_df) else None
+    test_dataset = GrooveDataset(test_df)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, drop_last=False)
     val_loader = (
@@ -304,7 +306,7 @@ def create_data_loaders(
 def main() -> None:
     random_state = 42
     set_global_seed(random_state)
-    dataset_path = Path("datasets/ETS1/dataset_ETS1_encoded.csv")
+    dataset_path = Path(f"datasets/{TF}/dataset_{TF}_encoded.csv")
     train_loader, val_loader, test_loader = create_data_loaders(
         dataset_path,
         batch_size=32,
@@ -314,11 +316,11 @@ def main() -> None:
     )
 
     model = Model(random_state=random_state)
-    print(f"Training CNN with {model.num_params} trainable parameters on device {model.device}.")
+    print(f"Training CNN on device {model.device}.")
     history = model.fit(
         train_loader,
         val_loader=val_loader,
-        epochs=50,
+        epochs=100,
         lr=3e-3,
         weight_decay=1e-4,
         patience=8,
@@ -330,7 +332,7 @@ def main() -> None:
 
     artefact_dir = Path("models")
     artefact_dir.mkdir(exist_ok=True, parents=True)
-    weights_path = artefact_dir / "02_cnn_ets1.pt"
+    weights_path = artefact_dir / f"03_cnn_{TF}.pt"
     model.save(weights_path)
     print(f"Saved model weights to {weights_path}")
 

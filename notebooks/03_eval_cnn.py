@@ -12,30 +12,30 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from matplotlib import pyplot as plt
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-from src.constants import ETS1_LEN, fg_encode_map, COLOR_MODS
+from src.constants import *
+from src.encode import groove_stack_to_tensor
 
-DEFAULT_DATASET = Path("datasets/ETS1/dataset_ETS1_encoded.csv")
+TF = "EGR1"
+DEFAULT_DATASET = Path(f"datasets/{TF}/dataset_{TF}_encoded.csv")
 DEFAULT_MODEL_HINTS = (
-    Path("models/02_cnn_ets1.pt"),
+    Path(f"models/03_cnn_{TF}.pt"),
 )
 
 
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Load a trained ETS1 CNN model and visualise test predictions."
+        description="Load a trained CNN model and visualise test predictions."
     )
     parser.add_argument(
         "--dataset",
         type=Path,
         default=DEFAULT_DATASET,
-        help=f"CSV with encoded ETS1 data (default: {DEFAULT_DATASET})",
+        help=f"CSV with encoded data (default: {DEFAULT_DATASET})",
     )
     parser.add_argument(
         "--model",
@@ -46,14 +46,14 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--scatter-output",
         type=Path,
-        default=Path("plots/ETS1_cnn_test_scatter.png"),
-        help="Where to save the scatter plot (default: plots/ETS1_cnn_test_scatter.png).",
+        default=Path(f"plots/{TF}_cnn_test_scatter.png"),
+        help="Where to save the scatter plot (default: plots/cnn_test_scatter.png).",
     )
     parser.add_argument(
         "--errorbar-output",
         type=Path,
-        default=Path("plots/ETS1_cnn_category_mae.png"),
-        help="Where to save the per-category MAE bar chart (default: plots/ETS1_cnn_category_mae.png).",
+        default=Path(f"plots/{TF}_cnn_category_mae.png"),
+        help="Where to save the per-category MAE bar chart (default: plots/cnn_category_mae.png).",
     )
     parser.add_argument(
         "--show",
@@ -74,22 +74,19 @@ def parse_arguments() -> argparse.Namespace:
     )
     return parser.parse_args()
 
-
-from src.encode import groove_stack_to_tensor
-
-
 def parse_groove_column(value: Iterable) -> list:
     if isinstance(value, list):
         return value
     return literal_eval(value)
 
+TF_LEN = globals().get(f"{TF}_LEN", 0)
 
 def encode_sequences(df: pd.DataFrame) -> np.ndarray:
     tensors = []
     for _, row in df.iterrows():
         major = parse_groove_column(row["Groove_major"])
         minor = parse_groove_column(row["Groove_minor"])
-        tensors.append(groove_stack_to_tensor(major, minor, length=ETS1_LEN))
+        tensors.append(groove_stack_to_tensor(major, minor, length=TF_LEN))
     return np.stack(tensors, axis=0)
 
 
@@ -111,7 +108,7 @@ def resolve_model_path(explicit: Path | None) -> Path:
         return torch_candidates[0]
     raise FileNotFoundError(
         "Could not locate saved CNN weights. "
-        "Run notebooks/03_cnn_ETS1.py and save the trained model to the models/ directory."
+        "Run notebooks/03_cnn.py and save the trained model to the models/ directory."
     )
 
 def load_state_dict(model_path: Path, device: torch.device) -> dict:
@@ -151,7 +148,7 @@ def plot_predictions(
     ax.plot([p2, p1], [p2, p1], "k-")
     ax.annotate(r"$R^2$ = {:.3f}".format(r2), (p2, p1), fontsize=11)
     ax.legend(loc="lower right", title="Category")
-    ax.set_title("ETS1 (Test dataset)", fontsize=12)
+    ax.set_title(f"{TF} (Test dataset)", fontsize=12)
     fig.tight_layout()
     return fig
 

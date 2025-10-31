@@ -13,7 +13,7 @@ class CNN_network(nn.Module):
 
         self.conv2 = nn.Conv2d(4, 4, (2, 4), stride=2)
 
-        self.fc1 = nn.Linear(24, 8)
+        self.fc1 = nn.LazyLinear(8)
         self.fc2 = nn.Linear(8, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
