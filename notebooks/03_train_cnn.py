@@ -330,7 +330,7 @@ def main() -> None:
     test_loss = model.evaluate(test_loader)
     print(f"Test MSE loss: {test_loss:.5f}")
 
-    artefact_dir = Path("models")
+    artefact_dir = Path("saved_models")
     artefact_dir.mkdir(exist_ok=True, parents=True)
     weights_path = artefact_dir / f"03_cnn_{TF}.pt"
     model.save(weights_path)

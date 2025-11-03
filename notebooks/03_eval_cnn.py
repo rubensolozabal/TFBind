@@ -22,7 +22,7 @@ from src.encode import groove_stack_to_tensor
 TF = "EGR1"
 DEFAULT_DATASET = Path(f"datasets/{TF}/dataset_{TF}_encoded.csv")
 DEFAULT_MODEL_HINTS = (
-    Path(f"models/03_cnn_{TF}.pt"),
+    Path(f"saved_models/03_cnn_{TF}.pt"),
 )
 
 
@@ -108,7 +108,7 @@ def resolve_model_path(explicit: Path | None) -> Path:
         return torch_candidates[0]
     raise FileNotFoundError(
         "Could not locate saved CNN weights. "
-        "Run notebooks/03_cnn.py and save the trained model to the models/ directory."
+        "Run notebooks/03_cnn.py and save the trained model to the saved_models/ directory."
     )
 
 def load_state_dict(model_path: Path, device: torch.device) -> dict:

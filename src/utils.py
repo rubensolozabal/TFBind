@@ -109,7 +109,7 @@ def categorize_change(change: str) -> str:
     labels = [mapping.get(ch, mapping.get(str(ch).upper(), "WC")) for ch in chars]
     non_wc = [lbl for lbl in labels if lbl != "WC"]
     if not non_wc:
-        return "none"
+        return "mismatch"
     if len(non_wc) == 1:
         return non_wc[0]
-    return "both"
+    return "mod_on_both_bases"
