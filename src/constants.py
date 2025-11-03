@@ -17,7 +17,7 @@ COLOR_FG = {'A': (1.0, 0.0, 0.0),  # red
             'x': (0.0, 0.0, 0.0)}  # black
 
 COLOR_MODS = {
-    "none": "#1f77b4",
+    "mismatch": "#1f77b4",
     "I": "#17becf",
     "D": "#7f7f7f",
     "6mA": "#e377c2",
@@ -25,7 +25,7 @@ COLOR_MODS = {
     "7dG": "#d62728",
     "dUPT": "#9467bd",
     "5mC": "#8c564b",
-    "both": "#bcbd22",
+    "mod_on_both_bases": "#bcbd22",
 }
 
 # Encoding functional groups
