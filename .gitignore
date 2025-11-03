@@ -1,4 +1,6 @@
-data/
+data/*
+datasets/*
+!datasets/create_dataset.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
