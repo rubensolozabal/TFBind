@@ -78,6 +78,6 @@ Interact with the models available in the `notebooks/` subfolder:
 
 ### Zero-Shot Prediction of chemical modifications
 
-This notebook extends the linear regression baseline for zero-shot prediction on chemical modifications. Follow the same steps as the standard linear notebook; it automatically trains on unmodified (`Category == "none"`) samples and evaluates on modified categories.
+This notebook extends the linear regression baseline for zero-shot prediction on chemical modifications.
 
 
