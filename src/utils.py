@@ -97,7 +97,7 @@ def categorize_change(change: str) -> str:
         "C": "WC",
         "G": "WC",
         "T": "WC",
-        "U": "dUPT",
+        "U": "dUTP",
         "X": "5mC",
         "a": "7dA",
         "g": "7dG",

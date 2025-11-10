@@ -23,7 +23,7 @@ COLOR_MODS = {
     "6mA": "#e377c2",
     "7dA": "#ff7f0e",
     "7dG": "#d62728",
-    "dUPT": "#9467bd",
+    "dUTP": "#9467bd",
     "5mC": "#8c564b",
     "mod_on_both_bases": "#bcbd22",
 }
