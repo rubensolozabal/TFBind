@@ -45,6 +45,21 @@ MG_funcGroups= {
     'D' : ['x','x'] # D
 }
 
+
+# Create a dictionary for the trivial prediction e.g. 5mC -> C
+TRIVIAL_BASE_MAP = {
+    'X': 'C',  # 5mC
+    'M': 'A',  # 6mA
+    'a': 'A',  # 7dA
+    'g': 'G',  # 7dG
+    'U': 'T',  # dUTP / U -> T in DNA context
+    'I': 'G',  # Inosine treated as G
+    'D': 'D',   # Deletion -> empty
+}
+
+TRIVIAL_PREDICTION_MAP = {**{b: b for b in NATURAL_BASES}, **TRIVIAL_BASE_MAP}
+
+
 # and in minor Groove:
 mG_funcGroups= {
     'A': ['A','n'],
