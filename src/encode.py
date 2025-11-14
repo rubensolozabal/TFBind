@@ -18,11 +18,11 @@ def groove_encoding_for_pair(pair: str) -> Tuple[str, str]:
     """
     if not isinstance(pair, str):
         raise TypeError("pair must be a string")
-    p = pair.upper()
-    if len(p) != 2:
+
+    if len(pair) != 2:
         raise ValueError("pair must be two characters long")
 
-    base1, base2 = p[0], p[1]
+    base1, base2 = pair[0], pair[1]
 
     if base1 not in MG_funcGroups or base2 not in MG_funcGroups:
         raise ValueError(f"Unsupported pair {pair!r}")
